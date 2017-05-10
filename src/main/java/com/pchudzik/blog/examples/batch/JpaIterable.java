@@ -41,6 +41,14 @@ class JpaIterable implements Iterable<Product> {
 			return productsIterator.hasNext();
 		}
 
+		@Override
+		public Product next() {
+			if(!hasNext()) {
+				throw new NoSuchElementException("No more elements");
+			}
+			return productsIterator.next();
+		}
+
 		private void loadNextPage() {
 			final List<Product> productsPage = entityManager
 					.createQuery("from Product order by id", Product.class)
@@ -50,14 +58,6 @@ class JpaIterable implements Iterable<Product> {
 
 			firstResult += productsPage.size();
 			productsIterator = productsPage.iterator();
-		}
-
-		@Override
-		public Product next() {
-			if(!hasNext()) {
-				throw new NoSuchElementException("No more elements");
-			}
-			return productsIterator.next();
 		}
 	}
 }
