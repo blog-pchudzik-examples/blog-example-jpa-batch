@@ -68,4 +68,23 @@ class HibernateIterableTest extends Specification {
 		cleanup:
 		iterator.close()
 	}
+
+	def "hasNext shouldn't go forward"() {
+		given:
+		final p1 = entityManager.merge(new Product("a", 1.0))
+		final p2 = entityManager.merge(new Product("b", 2.0))
+		final p3 = entityManager.merge(new Product("c", 3.0))
+
+		when:
+		final iterator = hibernateIterable.iterator()
+
+		then:
+		(0..3).each { assert iterator.hasNext() }
+
+		and:
+		iterator.next().id == p1.id
+
+		cleanup:
+		iterator.close()
+	}
 }

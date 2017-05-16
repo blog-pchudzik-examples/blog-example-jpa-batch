@@ -6,7 +6,7 @@ import org.springframework.data.repository.Repository;
 
 import java.util.stream.Stream;
 
-interface ProductRepository extends Repository<Product, Long> {
+interface SpringDataStream extends Repository<Product, Long> {
 	@Query("from Product order by id")
 	Stream<Product> findProducts();
 }

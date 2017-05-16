@@ -7,10 +7,12 @@ import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
+import javax.swing.text.html.Option;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +27,8 @@ class HibernateIterable implements Iterable<Product> {
 	private class ProductIterator implements Iterator<Product>, Closeable {
 		private final ScrollableResults scrollableResults;
 
+		private Object[] nextRow;
+
 		ProductIterator() {
 			final Session session = entityManager.unwrap(Session.class);
 
@@ -35,23 +39,40 @@ class HibernateIterable implements Iterable<Product> {
 
 		@Override
 		public boolean hasNext() {
-			return scrollableResults.next();
+			if (!hasNextRow()) {
+				return goToNextRow();
+			}
+
+			return hasNextRow();
 		}
 
 		@Override
 		public Product next() {
-			final Object [] productRow = scrollableResults.get();
-
-			if(productRow == null) {
+			if (!hasNext()) {
 				throw new NoSuchElementException("No more results");
 			}
 
-			return (Product) productRow[0];
+			try {
+				return (Product) nextRow[0];
+			} finally {
+				goToNextRow();
+			}
 		}
 
 		@Override
 		public void close() throws IOException {
 			scrollableResults.close();
+		}
+
+		private boolean goToNextRow() {
+			scrollableResults.next();
+			nextRow = scrollableResults.get();
+
+			return hasNextRow();
+		}
+
+		private boolean hasNextRow() {
+			return nextRow != null;
 		}
 	}
 }

@@ -11,12 +11,12 @@ import static java.util.stream.Collectors.toList
 
 @SpringBootTest
 @Transactional
-class ProductRepositoryTest extends Specification {
+class SpringDataStreamTest extends Specification {
 	@Autowired
 	EntityManager entityManager
 
 	@Autowired
-	ProductRepository productrepository
+	SpringDataStream productrepository
 
 	def "should find all products exactly one time"() {
 		given:
